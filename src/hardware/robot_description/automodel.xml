@@ -1,0 +1,29 @@
+<robot name="automodel">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.075" rpy="0 0 0"/>
+      <geometry> <box size="0.2 0.2 0.15"/></geometry>
+      <material name="blue"><color rgba="0 0 1 1"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0.1 0 0.04" rpy="0 0 0"/>
+      <geometry> <box size="0.2 0.2 0.08"/></geometry>
+      <material name="blue"><color rgba="0 0 1 1"/></material>
+    </visual>
+  </link>
+  
+  <link name="AutoNOMOS_mini/map">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry> <box size="0.08 0.08 0.08"/></geometry>
+      <material name="black"><color rgba="0.2 0.2 0.2 1"/></material>
+    </visual>
+  </link>
+  
+  <joint name="laser_connect" type="fixed">
+    <origin xyz="0 0 0.19" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="AutoNOMOS_mini/map"/>
+  </joint>
+  
+</robot>

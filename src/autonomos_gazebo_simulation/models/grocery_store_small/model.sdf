@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="grocery_store">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <pose>0 0 0.4046044867 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>3.2198468496 1.7542547846 0.8092089734</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <pose>0 -0.1961551703 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://grocery_store/meshes/grocery_store.dae</uri>
+            <scale>0.1 0.1 0.1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>
