@@ -727,6 +727,19 @@ sensor_msgs_generate_messages_lisp/fast:
 .PHONY : sensor_msgs_generate_messages_lisp/fast
 
 #=============================================================================
+# Target rules for targets named lane_detection
+
+# Build rule for target.
+lane_detection: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 lane_detection
+.PHONY : lane_detection
+
+# fast build rule for target.
+lane_detection/fast:
+	$(MAKE) -f lane_detection/CMakeFiles/lane_detection.dir/build.make lane_detection/CMakeFiles/lane_detection.dir/build
+.PHONY : lane_detection/fast
+
+#=============================================================================
 # Target rules for targets named lane_dbscan
 
 # Build rule for target.
@@ -740,17 +753,17 @@ lane_dbscan/fast:
 .PHONY : lane_dbscan/fast
 
 #=============================================================================
-# Target rules for targets named lane_detection
+# Target rules for targets named lane_kitcar
 
 # Build rule for target.
-lane_detection: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 lane_detection
-.PHONY : lane_detection
+lane_kitcar: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 lane_kitcar
+.PHONY : lane_kitcar
 
 # fast build rule for target.
-lane_detection/fast:
-	$(MAKE) -f lane_detection/CMakeFiles/lane_detection.dir/build.make lane_detection/CMakeFiles/lane_detection.dir/build
-.PHONY : lane_detection/fast
+lane_kitcar/fast:
+	$(MAKE) -f lane_detection/CMakeFiles/lane_kitcar.dir/build.make lane_detection/CMakeFiles/lane_kitcar.dir/build
+.PHONY : lane_kitcar/fast
 
 #=============================================================================
 # Target rules for targets named trajectory_msgs_generate_messages_cpp
@@ -1276,8 +1289,9 @@ help:
 	@echo "... sensor_msgs_generate_messages_cpp"
 	@echo "... sensor_msgs_generate_messages_eus"
 	@echo "... sensor_msgs_generate_messages_lisp"
-	@echo "... lane_dbscan"
 	@echo "... lane_detection"
+	@echo "... lane_dbscan"
+	@echo "... lane_kitcar"
 	@echo "... trajectory_msgs_generate_messages_cpp"
 	@echo "... trajectory_msgs_generate_messages_eus"
 	@echo "... gazebo_msgs_generate_messages_py"

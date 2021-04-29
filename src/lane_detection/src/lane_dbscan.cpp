@@ -382,7 +382,7 @@ class LineDetection{
             vector<PointC> data;
 	    vector<vector<PointC>> data_cluster;
             int MINIMUM_POINTS = 4.0;// minimum number of cluster
-            int EPSILON = 60.0;// distance for clustering
+            int EPSILON = 2.0;// distance for clustering
             data = non_zeros(img);
             DBCAN dbScan(20,EPSILON,MINIMUM_POINTS,data);
             dbScan.run();

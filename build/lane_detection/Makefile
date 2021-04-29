@@ -80,6 +80,16 @@ install/fast: preinstall/fast
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -113,16 +123,6 @@ test:
 test/fast: test
 
 .PHONY : test/fast
-
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -168,6 +168,21 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+lane_detection/CMakeFiles/lane_detection.dir/rule:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 lane_detection/CMakeFiles/lane_detection.dir/rule
+.PHONY : lane_detection/CMakeFiles/lane_detection.dir/rule
+
+# Convenience name for target.
+lane_detection: lane_detection/CMakeFiles/lane_detection.dir/rule
+
+.PHONY : lane_detection
+
+# fast build rule for target.
+lane_detection/fast:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_detection.dir/build.make lane_detection/CMakeFiles/lane_detection.dir/build
+.PHONY : lane_detection/fast
+
+# Convenience name for target.
 lane_detection/CMakeFiles/lane_dbscan.dir/rule:
 	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 lane_detection/CMakeFiles/lane_dbscan.dir/rule
 .PHONY : lane_detection/CMakeFiles/lane_dbscan.dir/rule
@@ -183,19 +198,19 @@ lane_dbscan/fast:
 .PHONY : lane_dbscan/fast
 
 # Convenience name for target.
-lane_detection/CMakeFiles/lane_detection.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 lane_detection/CMakeFiles/lane_detection.dir/rule
-.PHONY : lane_detection/CMakeFiles/lane_detection.dir/rule
+lane_detection/CMakeFiles/lane_kitcar.dir/rule:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 lane_detection/CMakeFiles/lane_kitcar.dir/rule
+.PHONY : lane_detection/CMakeFiles/lane_kitcar.dir/rule
 
 # Convenience name for target.
-lane_detection: lane_detection/CMakeFiles/lane_detection.dir/rule
+lane_kitcar: lane_detection/CMakeFiles/lane_kitcar.dir/rule
 
-.PHONY : lane_detection
+.PHONY : lane_kitcar
 
 # fast build rule for target.
-lane_detection/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_detection.dir/build.make lane_detection/CMakeFiles/lane_detection.dir/build
-.PHONY : lane_detection/fast
+lane_kitcar/fast:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_kitcar.dir/build.make lane_detection/CMakeFiles/lane_kitcar.dir/build
+.PHONY : lane_kitcar/fast
 
 src/lane_dbscan.o: src/lane_dbscan.cpp.o
 
@@ -251,6 +266,33 @@ src/lane_detection.cpp.s:
 	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_detection.dir/build.make lane_detection/CMakeFiles/lane_detection.dir/src/lane_detection.cpp.s
 .PHONY : src/lane_detection.cpp.s
 
+src/lane_kitcar.o: src/lane_kitcar.cpp.o
+
+.PHONY : src/lane_kitcar.o
+
+# target to build an object file
+src/lane_kitcar.cpp.o:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_kitcar.dir/build.make lane_detection/CMakeFiles/lane_kitcar.dir/src/lane_kitcar.cpp.o
+.PHONY : src/lane_kitcar.cpp.o
+
+src/lane_kitcar.i: src/lane_kitcar.cpp.i
+
+.PHONY : src/lane_kitcar.i
+
+# target to preprocess a source file
+src/lane_kitcar.cpp.i:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_kitcar.dir/build.make lane_detection/CMakeFiles/lane_kitcar.dir/src/lane_kitcar.cpp.i
+.PHONY : src/lane_kitcar.cpp.i
+
+src/lane_kitcar.s: src/lane_kitcar.cpp.s
+
+.PHONY : src/lane_kitcar.s
+
+# target to generate assembly for a file
+src/lane_kitcar.cpp.s:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f lane_detection/CMakeFiles/lane_kitcar.dir/build.make lane_detection/CMakeFiles/lane_kitcar.dir/src/lane_kitcar.cpp.s
+.PHONY : src/lane_kitcar.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -259,12 +301,13 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install"
+	@echo "... list_install_components"
+	@echo "... lane_detection"
 	@echo "... rebuild_cache"
 	@echo "... lane_dbscan"
+	@echo "... lane_kitcar"
 	@echo "... install/local"
 	@echo "... test"
-	@echo "... lane_detection"
-	@echo "... list_install_components"
 	@echo "... edit_cache"
 	@echo "... src/lane_dbscan.o"
 	@echo "... src/lane_dbscan.i"
@@ -272,6 +315,9 @@ help:
 	@echo "... src/lane_detection.o"
 	@echo "... src/lane_detection.i"
 	@echo "... src/lane_detection.s"
+	@echo "... src/lane_kitcar.o"
+	@echo "... src/lane_kitcar.i"
+	@echo "... src/lane_kitcar.s"
 .PHONY : help
 
 

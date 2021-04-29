@@ -46,7 +46,7 @@ class LineDetection{
  	    float polyleft_last[3],polyright_last[3];
         Point2f Source[4];
         Point2f Destination[4];
-        vector<Point> Source_points;
+        //vector<Point> Source_points;
 		int center_cam;
     	int center_lines;
 		int distance_center;
@@ -61,22 +61,21 @@ class LineDetection{
 	    angle_line_pub = nh_.advertise<std_msgs::UInt8>("/angle_line_now",1000);
         cv::namedWindow(OPENCV_WINDOW, WINDOW_KEEPRATIO);
  
-        Source[0] = Point2f(140 * 0.5, 280* 0.5);
-        Source[1] = Point2f(500* 0.5, 280* 0.5);
-        Source[2] = Point2f(0, 340* 0.5);
-        Source[3] = Point2f(640* 0.5, 340* 0.5);
-        //init points to desination
-        Destination[0]=Point2f(140* 0.5, 0);
-        Destination[1]=Point2f(500* 0.5, 0);
-        Destination[2]=Point2f(140* 0.5, 340* 0.5);
-        Destination[3]=Point2f(500* 0.5, 340* 0.5); 
-
-        
+        Source[0] = Point2f(160 * 0.5, 300 * 0.5);
+        Source[1] = Point2f(480 * 0.5, 300 * 0.5);
+        Source[2] = Point2f(0, 400 * 0.5);
+        Source[3] = Point2f(640 * 0.5, 400 * 0.5);
+        //init points to desinations
+        Destination[0]=Point2f(160 * 0.5, 0);
+        Destination[1]=Point2f(480 * 0.5, 0);
+        Destination[2]=Point2f(160 * 0.5, 480 * 0.5);
+        Destination[3]=Point2f(480 * 0.5, 480 * 0.5); 
+        /*
         Source_points.push_back(Point(500* 0.5, 280* 0.5));
         Source_points.push_back(Point(640* 0.5, 340* 0.5));
         Source_points.push_back(Point(0, 340* 0.5));
         Source_points.push_back(Point(140 * 0.5, 280* 0.5));
-
+        */
 	   	distance_center = 0.0;
 	    center_cam = 0;
         center_lines = 0;
@@ -102,12 +101,12 @@ class LineDetection{
 	       	resize_image(frame,0.5);
             Mat copy_frame = frame.clone(); 
             Mat empty_frame = Mat::zeros( frame.rows, frame.cols, frame.type());
-            fillConvexPoly(copy_frame, Source_points, Scalar(0,0,0),8,0);
+            //fillConvexPoly(copy_frame, Source_points, Scalar(0,0,0),8,0);
             Mat invertedPerspectiveMatrix;
-	        Perspective(frame, invertedPerspectiveMatrix);
-            //draw_bird_eye_line(frame, Source, Destination);
-	        img_edges = Threshold(frame);
-	        locate_lanes(img_edges,frame);
+            //draw_bird_eye_line(frame, Source, Destination); 
+            Perspective(frame, invertedPerspectiveMatrix);
+            img_edges = Threshold(frame);
+            locate_lanes(img_edges, frame);
             draw_lines(frame);   
             warpPerspective(frame,empty_frame,invertedPerspectiveMatrix,Size(frame.cols,frame.rows));
             bitwise_xor(copy_frame , empty_frame, frame);
@@ -116,9 +115,8 @@ class LineDetection{
             ss<<"[ANG]: "<<angle;
             putText(frame, ss.str(), Point2f(2,20), 0,1, Scalar(0,255,255), 2);
             resizeWindow(OPENCV_WINDOW,frame.cols, frame.rows);
-          	cv::imshow(OPENCV_WINDOW, frame);
+          	cv::imshow(OPENCV_WINDOW,frame);
             cv::waitKey(10);
-
             center_message.data = distance_center;
             center_pub.publish(center_message);
 	    	angle_line_message.data = angle;
@@ -273,7 +271,7 @@ class LineDetection{
 	        leftx_current = locate_histogram[0];
 	        rightx_current = locate_histogram[1];
 	        // Set the width of the windows +/- margin
-	        margin = 35;
+	        margin = 32;
 	        minpix = 40;
 	        // Set minimum number of pixels found to recenter window
 	        for(int window=0;window<nwindows;window++)

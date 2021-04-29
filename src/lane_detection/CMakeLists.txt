@@ -208,6 +208,16 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+if(COMPILER_SUPPORTS_CXX17)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+else()
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
+endif()
+
+
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
@@ -218,3 +228,8 @@ target_link_libraries(lane_dbscan ${OpenCV_LIBRARIES})
 add_executable(lane_detection src/lane_detection.cpp)
 target_link_libraries(lane_detection ${catkin_LIBRARIES})
 target_link_libraries(lane_detection ${OpenCV_LIBRARIES})
+
+
+add_executable(lane_kitcar src/lane_kitcar.cpp)
+target_link_libraries(lane_kitcar ${catkin_LIBRARIES})
+target_link_libraries(lane_kitcar ${OpenCV_LIBRARIES})
