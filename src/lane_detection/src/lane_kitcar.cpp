@@ -127,22 +127,10 @@ class LineDetection{
             //draw_bird_eye_line(frame, Source, Destination); 
             Perspective(frame, invertedPerspectiveMatrix);
             img_edges = Threshold(frame);
-            //img_edges.assignTo(img_edges, CV_8UC1); 
             points_.clear();
             clusteredPoints_.clear();
             cv::findNonZero(img_edges, points_);
             FindClusters(points_, clusteredPoints_, maxRadiusForCluster, minPointsPerLandmark, maxPointsPerLandmark);
-            /*
-            locate_lanes(img_edges, frame);
-            draw_lines(frame);   
-            warpPerspective(frame,empty_frame,invertedPerspectiveMatrix,Size(frame.cols,frame.rows));
-            bitwise_xor(copy_frame , empty_frame, frame);
-            ss.str(" ");
-    	    ss.clear();
-            ss<<"[ANG]: "<<angle;
-            putText(frame, ss.str(), Point2f(2,20), 0,1, Scalar(0,255,255), 2);
-            */
-            //cout << "Cluster points"<< clusteredPoints_.size() <<endl;
             for (auto& cluster : clusteredPoints_)
                 ReduceClusters(cluster);
             sort(clusteredPoints_.begin(), clusteredPoints_.end(), 
@@ -155,19 +143,24 @@ class LineDetection{
             //print_clusters(clusteredPoints_);
             locate_histogram = Histogram(img_edges);
             Find_lane_points(clusteredPoints_);
-            show_lane_points(frame, left_points);
-            show_lane_points(frame, right_points);
+            //show_lane_points(frame, left_points);
+            //show_lane_points(frame, right_points);
+            draw_lines(frame);   
+            warpPerspective(frame,empty_frame,invertedPerspectiveMatrix,Size(frame.cols,frame.rows));
+            bitwise_xor(copy_frame , empty_frame, frame);
+            ss.str(" ");
+    	    ss.clear();
+            ss<<"[ANG]: "<<angle;
+            putText(frame, ss.str(), Point2f(2,20), 0,1, Scalar(0,255,255), 2);
             //circle(frame, cv::Point(locate_histogram[0],  frame.rows -1),cvRound((double)4/ 2), Scalar(255, 0, 0),2);
             //circle(frame, cv::Point(locate_histogram[1],  frame.rows -1),cvRound((double)4/ 2), Scalar(0, 255, 0),2);
             resizeWindow(OPENCV_WINDOW,frame.cols, frame.rows);
           	cv::imshow(OPENCV_WINDOW,frame);
-            cv::waitKey(30);
-            /*
+            cv::waitKey(15);
             center_message.data = distance_center;
             center_pub.publish(center_message);
 	    	angle_line_message.data = angle;
 	    	angle_line_pub.publish(angle_line_message);
-            */
             set_end_time();
             ROS_INFO("[FPS]: %i ",FPS_subscriber());
         }
@@ -462,6 +455,248 @@ class LineDetection{
 	        return  LanePosition;
         }
 
+	bool regression_left(){
+
+        if (left_points.size() <= 0)
+            return false;
+
+	    long sumX[5] = {0,0,0,0,0};
+	    long sumY[3] = {0,0,0};
+	    long pow2 = 0;
+
+	    for (auto point = left_points.begin(); point != left_points.end(); point++){
+		    pow2 = (point->y) * (point->y);
+	        sumX[0]++;
+		    sumX[1] += (point->y);
+		    sumX[2] += pow2;
+		    sumX[3] += pow2 * (point->y);
+		    sumX[4] += pow2 * pow2;
+		    sumY[0] += (point->x);
+		    sumY[1] += (point->x) * (point->y);
+		    sumY[2] += (point->x) * pow2;
+	    }	
+        solve_system(sumX, sumY, polyleft);
+        return true;
+	}
+
+    bool regression_right(){
+
+        if (right_points.size() <= 0)
+            return false;
+	    long sumX[5] = {0,0,0,0,0};
+	    long sumY[3] = {0,0,0};
+	    long pow2 = 0;
+	    
+        for (auto point = right_points.begin(); point != right_points.end(); point++){
+		    pow2 = (point->y) * (point->y);
+	        sumX[0] ++;
+		    sumX[1] += (point->y);
+		    sumX[2] += pow2;
+		    sumX[3] += pow2 * (point->y);
+		    sumX[4] += pow2 * pow2;
+		    sumY[0] += (point->x);
+		    sumY[1] += (point->x) * (point->y);
+		    sumY[2] += (point->x) * pow2;
+	    }	
+        solve_system(sumX, sumY, polyright);
+        return true;
+	}
+ 	void solve_system(long *sX,long *sY,float *x){
+	    int n,i,j,k;
+        n=3;
+    	float a[n][n+1];
+        //declare an array to store the elements of augmented-matrix    
+    	//"Enter the elements of the augmented-matrix row-wise
+        a[0][0] = sX[0];   
+        a[0][1] = sX[1];   
+        a[0][2] = sX[2];   
+        a[0][3] = sY[0];
+        ////////////////   
+        a[1][0] = sX[1];   
+        a[1][1] = sX[2];   
+        a[1][2] = sX[3];   
+        a[1][3] = sY[1];  
+        ////////////////   
+        a[2][0] = sX[2];   
+        a[2][1] = sX[3];   
+        a[2][2] = sX[4];   
+        a[2][3] = sY[2];   
+        ////////////////
+        for (i = 0; i < n; i++)                    //Pivotisation
+            for (k = i+1; k<n; k++)
+                if (abs(a[i][i]) < abs(a[k][i]))
+                    for (j = 0; j <= n; j++){
+                        double temp = a[i][j];
+                        a[i][j] = a[k][j];
+                        a[k][j] = temp;
+                    }
+        for (i = 0; i <n-1; i++)            //loop to perform the gauss elimination
+            for (k = i+1; k < n; k++){
+                double t = a[k][i] / a[i][i];
+                for (j = 0; j <= n; j++)
+                    a[k][j] = a[k][j] - t * a[i][j];    //make the elements below the pivot elements equal to zero or elimnate the variables
+            }
+        for (i = n-1; i >= 0; i--)                //back-substitution
+        {                        //x is an array whose values correspond to the values of x,y,z..
+            x[i] = a[i][n];                //make the variable to be calculated equal to the rhs of the last equation
+            for (j = i+1; j<n; j++)
+                if (j != i)            //then subtract all the lhs values except the coefficient of the variable whose value                                   is being calculated
+                    x[i] = x[i] - a[i][j] * x[j];
+            x[i] = x[i] / a[i][i];            //now finally divide the rhs by the coefficient of the variable to be calculated
+        } 
+	}
+
+    void draw_lines(Mat &img)
+    {
+	    float columnL,columnL_aux;
+		float columnR,columnR_aux;
+	    float row;
+	    float m = 0.0,b = 0.0,c = 0.0;
+		bool find_line_left;
+		bool find_line_right;
+		float angle_to_mid_radian;
+		find_line_right = regression_right();
+		find_line_left = regression_left();
+		right_points.clear();
+	    left_points.clear();
+		center_cam = (img.cols / 2) + 1;
+        if(find_line_left && find_line_right){
+            
+            for(row = img.rows-1;row >= 0; row -= 8){
+                columnR = polyright[0] + polyright[1] * (row) + polyright[2] * (row * row);
+                circle(img, cv::Point(columnR, row), cvRound((double)4 / 2), Scalar(255, 0, 0), 2);
+                columnL = polyleft[0] + polyleft[1] * (row)+polyleft[2] * (row * row);
+                circle(img, cv::Point( columnL, row), cvRound((double)4 / 2), Scalar(255, 0, 0), 2);
+            }
+
+            center_lines = (columnR + columnL) / 2;
+            distance_center = center_cam - center_lines;
+		    
+            if(distance_center == 0)
+			    angle = 90;
+		    else{
+			    angle_to_mid_radian = atan(static_cast<float>(0 - (img.rows - 1)) / static_cast<float>(center_lines - center_cam));
+                angle  = static_cast<int>(angle_to_mid_radian * 57.295779);  
+                
+                if(angle < 0 && angle > (0 - 90))
+                    angle = (0-1) * (angle);
+                
+                else if(angle > 0 && angle < 90)
+                    angle = 180 - angle; 
+		    }
+            
+            line(img, Point(center_lines, 0), Point(center_cam, (img.rows - 1)), Scalar(0, 0, 255), 2); 
+            
+            for(int k = 0; k < 3;k++)
+            {
+                polyleft_last[k] = polyleft[k]; 
+                polyright_last[k] =polyright[k];
+            }
+        }
+        else if(find_line_left){
+            
+            for(row = img.rows-1; row >=0 ; row -= 8){
+                columnL = polyleft[0] + polyleft[1]*(row)+polyleft[2]*(row*row);
+                circle(img, cv::Point(columnL, row), cvRound((double)4 / 2), Scalar(255, 0, 0), 2);
+            }
+            //columnL = polyleft[0] + polyleft[1]*(0.0)+polyleft[2]*(0.0);
+            columnL = polyleft[0];
+            columnL_aux =  polyleft[0] + polyleft[1] * static_cast<float>(img.rows - 1) + polyleft[2] * ((img.rows - 1) * (img.rows - 1));
+            
+            if(columnL_aux == columnL){
+                angle = 90;
+                center_lines = columnL_aux;
+            }
+		    else{
+			    angle_to_mid_radian = atan(static_cast<float>(0 - (img.rows - 1)) / static_cast<float>(columnL - columnL_aux));
+                angle  = static_cast<int>(angle_to_mid_radian * 57.295779);  
+                
+                if(angle < 0 && angle > (0 - 90))
+                    angle = (0 - 1) * (angle);
+                
+                else if(angle > 0 && angle < 90)
+                    angle = 180 - angle; 
+                
+                if(angle < 90){
+                    angle_to_mid_radian =  (float)(angle) * 0.0174533;
+                    center_lines = center_cam + (int)(360.0 * cos(angle_to_mid_radian));
+                }
+                else{
+                    angle_to_mid_radian =  (float)(180 - angle) * 0.0174533;
+                    center_lines = center_cam - (int)(360.0 * cos(angle_to_mid_radian));
+                }
+		    }
+            distance_center = center_cam - center_lines;
+            
+            for(int k = 0; k < 3;k++)
+                polyleft_last[k] = polyleft[k]; 
+        }
+       
+        else if(find_line_right){
+            
+            for(row = img.rows - 1; row >= 0; row -= 8){
+                columnR = polyright[0] + polyright[1] * (row) + polyright[2] * (row * row);
+                circle(img,cv::Point(columnR,row),cvRound((double)4 / 2), Scalar(255, 0, 0), 2);
+            }
+            //columnR = polyright[0] + polyright[1]*(0.0)+polyright[2]*(0.0);
+            columnR = polyright[0];
+            columnR_aux = polyright[0] + polyright[1] * static_cast<float>(img.rows - 1) + polyright[2] * static_cast<float>((img.rows - 1) * (img.rows - 1));
+            
+            if(columnR_aux == columnR){
+                angle = 90;
+                center_lines = columnR_aux;
+            }
+		    else{
+			    angle_to_mid_radian = atan(static_cast<float>(0 - (img.rows - 1)) / static_cast<float>(columnR - columnR_aux ));
+                angle  = static_cast<int>(angle_to_mid_radian * 57.295779);  
+                
+                if(angle < 0 && angle > (0 - 90))
+                    angle = (0 - 1) * (angle);
+                
+                else if(angle > 0 && angle < 90)
+                    angle = 180 - angle; 
+                
+                if(angle < 90){
+                    angle_to_mid_radian =  angle * 0.0174533;
+                    center_lines = center_cam + (int)(360.0 * cos(angle_to_mid_radian));
+                }
+                else{
+                    angle_to_mid_radian =  (float)(180 - angle) * 0.0174533;
+                    center_lines = center_cam - (int)(360.0 * cos(angle_to_mid_radian));
+                }
+		    }
+            distance_center = center_cam - center_lines;
+             
+            for(int k = 0;k < 3;k++)
+                polyright[k] = polyright_last[k];
+        }
+        if(!find_line_left && !find_line_right){
+            
+            for(row = img.rows - 1; row >= 0; row -= 8){
+                columnR = polyright_last[0] + polyright_last[1] * (row) + polyright_last[2] * (row * row);
+                circle(img, cv::Point(columnR, row), cvRound((double)4 / 2), Scalar(255, 0, 0), 2);
+                columnL = polyleft_last[0] + polyleft_last[1] * (row) + polyleft_last[2] * (row * row);
+                circle(img, cv::Point(columnL, row),cvRound((double)4 / 2), Scalar(255, 0, 0), 2);
+            }
+            center_lines = (columnR + columnL) / 2;
+            distance_center = center_cam - center_lines;
+		    
+            if(distance_center == 0)
+			    angle = 90;
+		    else{
+			    angle_to_mid_radian = atan(static_cast<float>(0 - (img.rows - 1)) / static_cast<float>(center_lines - center_cam));
+                angle  = static_cast<int>(angle_to_mid_radian * 57.295779);  
+                
+                if(angle < 0 && angle > (0 - 90))
+                    angle = (0 - 1) * (angle);
+                
+                else if(angle > 0 && angle < 90)
+                    angle = 180 - angle; 
+		    }
+        }
+        line(img, Point(center_cam,(img.rows / 4)), Point(center_cam,(img.rows * 3 / 4)), Scalar(0, 255, 0), 2); 
+        line(img, Point(center_lines, 0), Point(center_cam, (img.rows - 1)), Scalar(0, 0, 255), 2);       
+        }
 };
 int main(int argc,char **argv){
     ros::init(argc, argv, "line_detection");
