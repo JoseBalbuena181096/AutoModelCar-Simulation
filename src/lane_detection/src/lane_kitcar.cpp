@@ -98,8 +98,8 @@ class LineDetection{
 		angle = 0;
 
   
-        maxRadiusForCluster = 20;
-        minPointsPerLandmark = 20;
+        maxRadiusForCluster = 15;
+        minPointsPerLandmark = 75;
         maxPointsPerLandmark = 1000;
         }
         //Destructor
@@ -120,13 +120,14 @@ class LineDetection{
                 return;
             }
 	       	resize_image(frame,0.5);
-            Mat copy_frame = frame.clone(); 
+            Mat copy_frame = frame.clone();
             Mat empty_frame = Mat::zeros( frame.rows, frame.cols, frame.type());
             //fillConvexPoly(copy_frame, Source_points, Scalar(0,0,0),8,0);
             Mat invertedPerspectiveMatrix;
             //draw_bird_eye_line(frame, Source, Destination); 
             Perspective(frame, invertedPerspectiveMatrix);
             img_edges = Threshold(frame);
+            
             points_.clear();
             clusteredPoints_.clear();
             cv::findNonZero(img_edges, points_);
@@ -139,12 +140,12 @@ class LineDetection{
                 auto last_point2 = cluster2.end()-1;
                 return (last_point1->y > last_point2->y);
             });
-            //show_clusters(frame, clusteredPoints_);
+            //show_clusters(copy_frame, clusteredPoints_);
             //print_clusters(clusteredPoints_);
             locate_histogram = Histogram(img_edges);
             Find_lane_points(clusteredPoints_);
-            //show_lane_points(frame, left_points);
-            //show_lane_points(frame, right_points);
+            //show_lane_points(copy_frame, left_points);
+            //show_lane_points(copy_frame, right_points);
             draw_lines(frame);   
             warpPerspective(frame,empty_frame,invertedPerspectiveMatrix,Size(frame.cols,frame.rows));
             bitwise_xor(copy_frame , empty_frame, frame);
@@ -152,10 +153,11 @@ class LineDetection{
     	    ss.clear();
             ss<<"[ANG]: "<<angle;
             putText(frame, ss.str(), Point2f(2,20), 0,1, Scalar(0,255,255), 2);
-            //circle(frame, cv::Point(locate_histogram[0],  frame.rows -1),cvRound((double)4/ 2), Scalar(255, 0, 0),2);
-            //circle(frame, cv::Point(locate_histogram[1],  frame.rows -1),cvRound((double)4/ 2), Scalar(0, 255, 0),2);
+            circle(frame, cv::Point(locate_histogram[0],  frame.rows -1),cvRound((double)4/ 2), Scalar(255, 0, 0),2);
+            circle(frame, cv::Point(locate_histogram[1],  frame.rows -1),cvRound((double)4/ 2), Scalar(0, 255, 0),2);
+            cout << "width line" << abs(locate_histogram[0]-locate_histogram[1]);
             resizeWindow(OPENCV_WINDOW,frame.cols, frame.rows);
-          	cv::imshow(OPENCV_WINDOW,frame);
+          	cv::imshow(OPENCV_WINDOW, frame);
             cv::waitKey(15);
             center_message.data = distance_center;
             center_pub.publish(center_message);
@@ -221,6 +223,7 @@ class LineDetection{
 	        cvtColor(frame, frameGray, COLOR_BGR2GRAY);
             medianBlur(frameGray, frameGray, 5);
 	        inRange(frameGray, 120, 255, frameGray);
+            width_filter(frameGray, 20);
             Sobel(frameGray, sobelx, CV_32F, 1, 0);
             minMaxLoc(sobelx, &minVal, &maxVal);
             sobelx.convertTo(frameGray, CV_8U, 255.0/(maxVal), - 255.0/(maxVal));
@@ -307,7 +310,7 @@ class LineDetection{
                 for (vector<Cluster>::iterator cluster =  clusteredPoints_.begin(); cluster != clusteredPoints_.end(); ){
                     auto first = left_points_stack.top().begin();
                     auto last =  cluster->end()-1;
-                    if (cv::norm(*first - *last) <= 75) {
+                    if (cv::norm(*first - *last) <= 50) {
                         left_points_stack.push(*cluster);
                         cluster = clusteredPoints_.erase(cluster);
                     }
@@ -338,7 +341,7 @@ class LineDetection{
                 for (vector<Cluster>::iterator cluster =  clusteredPoints_.begin(); cluster != clusteredPoints_.end(); ){
                     auto first = right_points_stack.top().begin();
                     auto last =  cluster->end()-1;
-                    if (cv::norm(*first - *last) <= 75) {
+                    if (cv::norm(*first - *last) <= 50) {
                         right_points_stack.push(*cluster);
                         cluster = clusteredPoints_.erase(cluster);
                     }
@@ -390,7 +393,45 @@ class LineDetection{
             }
         } 
 
-		void width_filter(Mat &img,int width_max=20)
+        void fill_white(Mat &img,int width_max=100)
+        {
+			uchar last_point;
+			int count_black;
+            int start;
+			uchar now_point;
+			for(int r = 0;r < img.rows;r++)
+            {
+			    uchar *pixel = img.ptr<uchar>(r);
+                last_point = 0;
+                start  = -1;
+                count_black = 0;
+
+	        	for(int c = 0;c<img.cols;c++)
+                {
+                    now_point = *(pixel+c);
+                    if(last_point > 0 && now_point == 0)
+                        start = c;
+
+                    if(start != -1)
+                        count_black++;
+                    
+                    if(last_point == 0 && now_point > 0 && start != -1)
+                    {
+                        if(count_black <= width_max)
+                        {
+                            if(start < 0)
+                                start = 0;
+                            for(int k = start;k < c;k++)
+                                *(pixel+k) = 255;
+                        }
+                        start = -1;
+                        count_black = 0;
+                    }
+                    last_point = now_point;
+		        }
+            }    
+		}
+void width_filter(Mat &img,int width_max=20)
         {
 			uchar last_point;
 			int count_white;
@@ -409,7 +450,7 @@ class LineDetection{
                         start = c;
                     if(start != -1)
                         count_white++;
-                    if(last_point > 0 && now_point == 0)
+                    if(last_point > 0 && now_point == 0 && start != -1)
                     {
                         if(count_white >= width_max)
                         {
@@ -559,7 +600,7 @@ class LineDetection{
 		find_line_left = regression_left();
 		right_points.clear();
 	    left_points.clear();
-		center_cam = (img.cols / 2) + 1;
+		center_cam = (img.cols / 2) - 20;
         if(find_line_left && find_line_right){
             
             for(row = img.rows-1;row >= 0; row -= 8){
@@ -694,7 +735,7 @@ class LineDetection{
                     angle = 180 - angle; 
 		    }
         }
-        line(img, Point(center_cam,(img.rows / 4)), Point(center_cam,(img.rows * 3 / 4)), Scalar(0, 255, 0), 2); 
+       // line(img, Point(center_cam,(img.rows / 4)), Point(center_cam,(img.rows * 3 / 4)), Scalar(0, 255, 0), 2); 
         line(img, Point(center_lines, 0), Point(center_cam, (img.rows - 1)), Scalar(0, 0, 255), 2);       
         }
 };

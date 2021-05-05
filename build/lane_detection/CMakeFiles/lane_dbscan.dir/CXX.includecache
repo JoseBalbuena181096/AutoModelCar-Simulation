@@ -33,9 +33,23 @@ opencv2/imgproc/imgproc.hpp
 -
 opencv2/highgui/highgui.hpp
 -
+cmath
+-
+cstdlib
+-
 chrono
 -
 ctime
+-
+algorithm
+-
+map
+-
+stack
+-
+queue
+-
+boost/range/adaptor/reversed.hpp
 -
 
 /opt/ros/melodic/include/cv_bridge/cv_bridge.h

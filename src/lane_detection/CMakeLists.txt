@@ -233,3 +233,7 @@ target_link_libraries(lane_detection ${OpenCV_LIBRARIES})
 add_executable(lane_kitcar src/lane_kitcar.cpp)
 target_link_libraries(lane_kitcar ${catkin_LIBRARIES})
 target_link_libraries(lane_kitcar ${OpenCV_LIBRARIES})
+
+add_executable(lane_autonomus  src/lane_autonomus.cpp)
+target_link_libraries(lane_autonomus ${catkin_LIBRARIES})
+target_link_libraries(lane_autonomus ${OpenCV_LIBRARIES})

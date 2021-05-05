@@ -132,15 +132,10 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/jose/catkin_ws/build/gtest/cmake_install.cmake")
   include("/home/jose/catkin_ws/build/bring_up/cmake_install.cmake")
-  include("/home/jose/catkin_ws/build/hardware/robot_description/cmake_install.cmake")
   include("/home/jose/catkin_ws/build/Gazebo_plugin/cmake_install.cmake")
   include("/home/jose/catkin_ws/build/control/cmake_install.cmake")
   include("/home/jose/catkin_ws/build/lane_detection/cmake_install.cmake")
   include("/home/jose/catkin_ws/build/autonomos_gazebo_simulation/cmake_install.cmake")
-  include("/home/jose/catkin_ws/build/knowledge/cmake_install.cmake")
-  include("/home/jose/catkin_ws/build/vision/lane_detector/cmake_install.cmake")
-  include("/home/jose/catkin_ws/build/navigation/odometry/cmake_install.cmake")
-  include("/home/jose/catkin_ws/build/simple_gui/cmake_install.cmake")
 
 endif()
 

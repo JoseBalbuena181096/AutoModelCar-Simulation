@@ -10,6 +10,7 @@ project(bring_up)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  gazebo_msgs
 )
 
 ## System dependencies are found with CMake's conventions

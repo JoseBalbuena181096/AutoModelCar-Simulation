@@ -14,8 +14,8 @@ std_msgs::Int16 speed_message;
 int angle_pid = 0;
 int angle_now = 0;
 int angle_last = 0;
-float kp_angle = 1.025;//1.025
-float kd_angle = 0.01085;
+float kp_angle = 0.825;//1.025
+float kd_angle = 0.0297;
 float error_angle = 0.0;
 int u_angle = 0;
 
@@ -32,10 +32,10 @@ void angle_nowCallback(const std_msgs::Int16& angle_now_message){
     else if(angle_pid >= 140)
 	    angle_pid = 140;
     u_speed = static_cast<int>(kp_speed * angle_pid);
-    speed_pid = - 800 + abs(u_speed);
+    speed_pid = - 350 + abs(u_speed);
     //speed_pid = -200;
-    if(speed_pid < - 800)
-	    speed_pid = - 800;
+    if(speed_pid < - 350)
+	    speed_pid = - 350;
     else if(speed_pid > -20)
 	    speed_pid = -20;
     angle_last = angle_pid;
@@ -54,8 +54,8 @@ int main(int argc, char **argv){
     //ros::Subscriber angle_now = nh.subscribe("/angle_line_now",1,angle_nowCallback);
     ros::Subscriber angle_now = nh.subscribe("/distance_center_line",1,angle_nowCallback);
     ros::Subscriber on_off_sub = nh.subscribe("/on_off",1,on_offCallback);
-    ros::Publisher angle_pub = nh.advertise<std_msgs::Int16>("/AutoNOMOS_mini/manual_control/steering",1000);
-    ros::Publisher speed_pub = nh.advertise<std_msgs::Int16>("/AutoNOMOS_mini/manual_control/speed",1000);
+    ros::Publisher angle_pub = nh.advertise<std_msgs::Int16>("/AutoModelMini/manual_control/steering",1000);
+    ros::Publisher speed_pub = nh.advertise<std_msgs::Int16>("/AutoModelMini/manual_control/speed",1000);
     ros::Rate loop_rate(40);   
   int count = 0;
   while (ros::ok())

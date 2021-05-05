@@ -1,2 +1,2 @@
-Gazebo_plugin:autonomos_gazebo_simulation:bring_up:control:hardware/robot_description:knowledge:lane_detection:navigation/odometry:simple_gui:vision/lane_detector
+Gazebo_plugin:autonomos_gazebo_simulation:bring_up:control:lane_detection
 -DCATKIN_DEVEL_PREFIX=/home/jose/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/jose/catkin_ws/install -G Unix Makefiles

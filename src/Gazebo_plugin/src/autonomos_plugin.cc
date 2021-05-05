@@ -129,10 +129,10 @@ namespace gazebo
       boost::bind(&autonomos_plugin::autonomos_disconnect, this),
       ros::VoidPtr(), NULL);
 
-      this->pub_ = this->rosNode->advertise(ao);
+     //this->pub_ = this->rosNode->advertise(ao);
 
       
-      this->pub_queue_ = this->pmq.addPub<geometry_msgs::Pose2D>();
+     //this->pub_queue_ = this->pmq.addPub<geometry_msgs::Pose2D>();
   }
 
   /// \brief Set the velocity of the Velodyne
@@ -250,7 +250,7 @@ namespace gazebo
       pose_msg.theta = pose.rot.GetYaw();
     #endif
 
-    this->pub_queue_->push(pose_msg, this->pub_);
+      //this->pub_queue_->push(pose_msg, this->pub_);
   }
       
   /// \brief ROS helper function that processes messages

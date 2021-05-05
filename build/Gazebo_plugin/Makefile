@@ -80,15 +80,27 @@ install/fast: preinstall/fast
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
 
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
 
-.PHONY : list_install_components/fast
+.PHONY : rebuild_cache/fast
+
+# Special rule for the target edit_cache
+edit_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
+	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+.PHONY : edit_cache
+
+# Special rule for the target edit_cache
+edit_cache/fast: edit_cache
+
+.PHONY : edit_cache/fast
 
 # Special rule for the target install/local
 install/local: preinstall
@@ -113,27 +125,15 @@ test/fast: test
 
 .PHONY : test/fast
 
-# Special rule for the target edit_cache
-edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
-.PHONY : edit_cache
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
 
-# Special rule for the target edit_cache
-edit_cache/fast: edit_cache
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
 
-.PHONY : edit_cache/fast
-
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
+.PHONY : list_install_components/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -168,81 +168,6 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-Gazebo_plugin/CMakeFiles/parking_lot.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/parking_lot.dir/rule
-.PHONY : Gazebo_plugin/CMakeFiles/parking_lot.dir/rule
-
-# Convenience name for target.
-parking_lot: Gazebo_plugin/CMakeFiles/parking_lot.dir/rule
-
-.PHONY : parking_lot
-
-# fast build rule for target.
-parking_lot/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/parking_lot.dir/build.make Gazebo_plugin/CMakeFiles/parking_lot.dir/build
-.PHONY : parking_lot/fast
-
-# Convenience name for target.
-Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_eus.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_eus.dir/rule
-.PHONY : Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_eus.dir/rule
-
-# Convenience name for target.
-geometry_msgs_generate_messages_eus: Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_eus.dir/rule
-
-.PHONY : geometry_msgs_generate_messages_eus
-
-# fast build rule for target.
-geometry_msgs_generate_messages_eus/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_eus.dir/build.make Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_eus.dir/build
-.PHONY : geometry_msgs_generate_messages_eus/fast
-
-# Convenience name for target.
-Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/rule
-.PHONY : Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-geometry_msgs_generate_messages_nodejs: Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : geometry_msgs_generate_messages_nodejs
-
-# fast build rule for target.
-geometry_msgs_generate_messages_nodejs/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/build.make Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/build
-.PHONY : geometry_msgs_generate_messages_nodejs/fast
-
-# Convenience name for target.
-Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
-.PHONY : Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-geometry_msgs_generate_messages_cpp: Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
-
-.PHONY : geometry_msgs_generate_messages_cpp
-
-# fast build rule for target.
-geometry_msgs_generate_messages_cpp/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/build.make Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/build
-.PHONY : geometry_msgs_generate_messages_cpp/fast
-
-# Convenience name for target.
-Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
-.PHONY : Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-geometry_msgs_generate_messages_lisp: Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/rule
-
-.PHONY : geometry_msgs_generate_messages_lisp
-
-# fast build rule for target.
-geometry_msgs_generate_messages_lisp/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build.make Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_lisp.dir/build
-.PHONY : geometry_msgs_generate_messages_lisp/fast
-
-# Convenience name for target.
 Gazebo_plugin/CMakeFiles/autonomos_plugin.dir/rule:
 	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/autonomos_plugin.dir/rule
 .PHONY : Gazebo_plugin/CMakeFiles/autonomos_plugin.dir/rule
@@ -258,19 +183,19 @@ autonomos_plugin/fast:
 .PHONY : autonomos_plugin/fast
 
 # Convenience name for target.
-Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_py.dir/rule:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_py.dir/rule
-.PHONY : Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_py.dir/rule
+Gazebo_plugin/CMakeFiles/parking_lot.dir/rule:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f CMakeFiles/Makefile2 Gazebo_plugin/CMakeFiles/parking_lot.dir/rule
+.PHONY : Gazebo_plugin/CMakeFiles/parking_lot.dir/rule
 
 # Convenience name for target.
-geometry_msgs_generate_messages_py: Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_py.dir/rule
+parking_lot: Gazebo_plugin/CMakeFiles/parking_lot.dir/rule
 
-.PHONY : geometry_msgs_generate_messages_py
+.PHONY : parking_lot
 
 # fast build rule for target.
-geometry_msgs_generate_messages_py/fast:
-	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_py.dir/build.make Gazebo_plugin/CMakeFiles/geometry_msgs_generate_messages_py.dir/build
-.PHONY : geometry_msgs_generate_messages_py/fast
+parking_lot/fast:
+	cd /home/jose/catkin_ws/build && $(MAKE) -f Gazebo_plugin/CMakeFiles/parking_lot.dir/build.make Gazebo_plugin/CMakeFiles/parking_lot.dir/build
+.PHONY : parking_lot/fast
 
 src/autonomos_plugin.o: src/autonomos_plugin.cc.o
 
@@ -334,18 +259,13 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install"
-	@echo "... list_install_components"
+	@echo "... rebuild_cache"
+	@echo "... autonomos_plugin"
+	@echo "... parking_lot"
+	@echo "... edit_cache"
 	@echo "... install/local"
 	@echo "... test"
-	@echo "... edit_cache"
-	@echo "... parking_lot"
-	@echo "... rebuild_cache"
-	@echo "... geometry_msgs_generate_messages_eus"
-	@echo "... geometry_msgs_generate_messages_nodejs"
-	@echo "... geometry_msgs_generate_messages_cpp"
-	@echo "... geometry_msgs_generate_messages_lisp"
-	@echo "... autonomos_plugin"
-	@echo "... geometry_msgs_generate_messages_py"
+	@echo "... list_install_components"
 	@echo "... src/autonomos_plugin.o"
 	@echo "... src/autonomos_plugin.i"
 	@echo "... src/autonomos_plugin.s"

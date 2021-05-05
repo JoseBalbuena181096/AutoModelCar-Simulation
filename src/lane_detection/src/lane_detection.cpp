@@ -116,7 +116,7 @@ class LineDetection{
             putText(frame, ss.str(), Point2f(2,20), 0,1, Scalar(0,255,255), 2);
             resizeWindow(OPENCV_WINDOW,frame.cols, frame.rows);
           	cv::imshow(OPENCV_WINDOW,frame);
-            cv::waitKey(10);
+            cv::waitKey(15);
             center_message.data = distance_center;
             center_pub.publish(center_message);
 	    	angle_line_message.data = angle;
@@ -182,6 +182,7 @@ class LineDetection{
 	        cvtColor(frame, frameGray, COLOR_BGR2GRAY);
             medianBlur(frameGray, frameGray, 5);
 	        inRange(frameGray, 120, 255, frameGray);
+            width_filter(frameGray,16);
 	        return frameGray;
         }
 
@@ -264,14 +265,16 @@ class LineDetection{
 	        int *locate_histogram;
 		    uchar now_left_point;
 		    uchar now_right_point;
+            bool end_left = false;
+            bool end_right = false;
             Point add_left_point,add_right_point;
-	        nwindows = 12;
+	        nwindows = 9;
 	        int window_height = img.rows/nwindows;
 	        locate_histogram = Histogram(img);
 	        leftx_current = locate_histogram[0];
 	        rightx_current = locate_histogram[1];
 	        // Set the width of the windows +/- margin
-	        margin = 32;
+	        margin = 15;
 	        minpix = 40;
 	        // Set minimum number of pixels found to recenter window
 	        for(int window=0;window<nwindows;window++)
@@ -337,7 +340,7 @@ class LineDetection{
 	    }
 	bool regression_left()
     {
-        if(left_points.size()<1000)
+        if(left_points.size()<100)
             return false;
 	    long sumX[5] = {0,0,0,0,0};
 	    long sumY[3] = {0,0,0};
@@ -360,7 +363,7 @@ class LineDetection{
 
     bool regression_right()
     {
-        if(right_points.size()<1000)
+        if(right_points.size()<100)
             return false;
 	    long sumX[5] = {0,0,0,0,0};
 	    long  sumY[3] = {0,0,0};
@@ -439,7 +442,7 @@ class LineDetection{
 		find_line_left = regression_left();
 		right_points.clear();
 	    left_points.clear();
-		center_cam =(img.cols/2)+1;
+		center_cam =(img.cols/2) - 10;
         if(find_line_left && find_line_right)
         {
             for(row = img.rows-1;row>=0;row-=8)
